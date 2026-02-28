@@ -1,1 +1,56 @@
 
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quotex Bot</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { font-family: Arial; text-align: center; padding: 20px; background: #1e1e2f; color: white; }
+        .card { background: #2d2d3a; padding: 20px; border-radius: 10px; margin: 20px; }
+        .buy { color: #4caf50; }
+        .sell { color: #f44336; }
+        .hold { color: #ff9800; }
+        button { padding: 15px 30px; font-size: 18px; margin: 10px; border: none; border-radius: 5px; }
+        .start { background: #4caf50; color: white; }
+        .stop { background: #f44336; color: white; }
+    </style>
+</head>
+<body>
+    <h1>🤖 Quotex Trading Bot</h1>
+    <div class="card">
+        <h2>বর্তমান সিগন্যাল</h2>
+        <p id="signalType" class="hold">{{ signal.type }}</p>
+        <p>কনফিডেন্স: <span id="confidence">{{ signal.confidence }}%</span></p>
+        <p>দাম: <span id="price">{{ signal.price }}</span></p>
+        <p>সময়: <span id="time">{{ signal.time }}</span></p>
+    </div>
+    <button class="start" onclick="startBot()">বট চালু করুন</button>
+    <button class="stop" onclick="stopBot()">বট বন্ধ করুন</button>
+
+    <script>
+        function startBot() {
+            fetch('/start', {method: 'POST'})
+                .then(res => res.json())
+                .then(data => alert('বট চালু হয়েছে'));
+        }
+        function stopBot() {
+            fetch('/stop', {method: 'POST'})
+                .then(res => res.json())
+                .then(data => alert('বট বন্ধ হয়েছে'));
+        }
+        // প্রতি ৫ সেকেন্ডে সিগন্যাল আপডেট
+        setInterval(() => {
+            fetch('/api/signal')
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('signalType').innerText = data.type;
+                    document.getElementById('confidence').innerText = data.confidence + '%';
+                    document.getElementById('price').innerText = data.price;
+                    document.getElementById('time').innerText = data.time;
+                    let elem = document.getElementById('signalType');
+                    elem.className = data.type.toLowerCase();
+                });
+        }, 5000);
+    </script>
+</body>
+</html>
